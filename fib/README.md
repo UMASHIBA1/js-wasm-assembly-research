@@ -1,12 +1,12 @@
 jsのプロファイリング
 ```shell
 cd js
-perf record node --perf-basic-prof --redirect-code-traces fib.js
+node --print-code fib.js > js-fib.asm
 ```
 
 rustのプロファイリング
 ```shell
 cd rust
 wasm-pack build --target nodejs --release
-perf record node --perf-basic-prof --redirect-code-traces js/index.js
+node --print-code js/index.js > rust-fib.asm
 ```
