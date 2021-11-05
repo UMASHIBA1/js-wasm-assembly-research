@@ -7,6 +7,6 @@ perf record node --perf-basic-prof-only-functions --print-code --redirect-code-t
 rustのプロファイリング
 ```shell
 cd rust
-npm run build
+wasm-pack build --target nodejs --release
 perf record node --perf-basic-prof-only-functions --print-code --redirect-code-traces js/index.js
 ```
