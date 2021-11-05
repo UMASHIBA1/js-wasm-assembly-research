@@ -1,3 +1,5 @@
+AWS EC2 t2.micro Amazon Linux上でアセンブリを取得
+
 jsのプロファイリング
 ```shell
 cd js
