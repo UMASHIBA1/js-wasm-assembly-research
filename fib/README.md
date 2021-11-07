@@ -13,4 +13,5 @@ cd rust
 wasm-pack build --target nodejs --release
 node --print-code js/index.js > rust-fib.asm
 node --always-opt --print-code js/index.js > rust-fib-opt-option.asm
+node --print-wasm-code js/index.js > rust-fib-only-wasm.asm
 ```
