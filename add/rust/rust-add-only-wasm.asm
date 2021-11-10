@@ -218,6 +218,10 @@ Safepoints (size = 20)
 RelocInfo (size = 0)
 
 --- End code ---
+
+;; UMASHIBA NOTE1: fib関数と比較ここまで違いなし
+
+
 --- WebAssembly code ---
 index: 32
 kind: wasm function
@@ -276,6 +280,9 @@ Safepoints (size = 20)
 RelocInfo (size = 0)
 
 --- End code ---
+
+;; UMASHIBA NOTE2: fib関数と比較ここまで違いなし
+
 --- WebAssembly code ---
 index: 31
 kind: wasm function
@@ -548,6 +555,9 @@ Safepoints (size = 20)
 RelocInfo (size = 0)
 
 --- End code ---
+
+;; UMASHIBA NOTE3: fib関数と比較ここまで多くの違いなし
+
 --- WebAssembly code ---
 index: 30
 kind: wasm function
@@ -18635,7 +18645,7 @@ Safepoints (size = 20)
 RelocInfo (size = 0)
 
 --- End code ---
---- WebAssembly code ---
+--- WebAssembly code ---　;; UMASHIBA NOTE4: add関数とアセンブリが同じため
 index: 16
 kind: wasm function
 compiler: TurboFan
@@ -18808,7 +18818,7 @@ RelocInfo (size = 21)
 0x104c72a8946e  wasm stub call
 
 --- End code ---
---- WebAssembly code ---
+--- WebAssembly code ---;; UMASHIBA NOTE5: add関数とアセンブリが同じためfibでないと判断
 index: 32
 kind: wasm function
 compiler: TurboFan
@@ -18863,7 +18873,7 @@ RelocInfo (size = 7)
 0x104c72a89529  wasm stub call
 
 --- End code ---
---- WebAssembly code ---
+--- WebAssembly code --- ;; UMASHIBA NOTE6: add関数とアセンブリが同じためfibでないと判断
 index: 31
 kind: wasm function
 compiler: TurboFan
@@ -19077,7 +19087,7 @@ RelocInfo (size = 33)
 0x104c72a89850  wasm stub call
 
 --- End code ---
---- WebAssembly code ---
+--- WebAssembly code ---;; UMASHIBA NOTE7: add関数とアセンブリが同じためfibでないと判断
 index: 30
 kind: wasm function
 compiler: TurboFan
@@ -19215,7 +19225,7 @@ RelocInfo (size = 19)
 0x104c72a89a30  internal reference
 
 --- End code ---
---- WebAssembly code ---
+--- WebAssembly code --- ;; UMASHIBA NOTE7: fib関数とアセンブリが違う！
 index: 29
 kind: wasm function
 compiler: TurboFan
