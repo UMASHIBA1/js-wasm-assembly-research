@@ -135,6 +135,8 @@ Safepoints (size = 20)
 RelocInfo (size = 0)
 
 --- End code ---
+
+;; 可能性ある
 --- WebAssembly code ---
 index: 0
 kind: wasm function
@@ -143,88 +145,88 @@ Body (size = 384 = 364 + 20 padding)
 Instructions (size = 344)
 0x2d706a6ac640     0  55             push rbp
 0x2d706a6ac641     1  4889e5         REX.W movq rbp,rsp
-0x2d706a6ac644     4  6a08           push 0x8
-0x2d706a6ac646     6  56             push rsi
-0x2d706a6ac647     7  4883ec18       REX.W subq rsp,0x18
-0x2d706a6ac64b     b  488b5e23       REX.W movq rbx,[rsi+0x23]
-0x2d706a6ac64f     f  48895dd8       REX.W movq [rbp-0x28],rbx
-0x2d706a6ac653    13  483b23         REX.W cmpq rsp,[rbx]
-0x2d706a6ac656    16  0f860c010000   jna 0x2d706a6ac768  <+0x128>
-0x2d706a6ac65c    1c  83f802         cmpl rax,0x2
-0x2d706a6ac65f    1f  0f8cd1000000   jl 0x2d706a6ac736  <+0xf6>
-0x2d706a6ac665    25  33d2           xorl rdx,rdx
+0x2d706a6ac644     4  6a08           push 0x8 ;; ここまで関数のスタック生成処理
+0x2d706a6ac646     6  56             push rsi ;; stack: rsi, 0x8 ;; rsi<-第二引数を格納
+0x2d706a6ac647     7  4883ec18       REX.W subq rsp,0x18 ;; rsp = rsp - 0x18
+0x2d706a6ac64b     b  488b5e23       REX.W movq rbx,[rsi+0x23] ;; rbx = memory(rsi + 0x23)
+0x2d706a6ac64f     f  48895dd8       REX.W movq [rbp-0x28],rbx ;; memory(rbp - 0x28) = rbx
+0x2d706a6ac653    13  483b23         REX.W cmpq rsp,[rbx] 
+0x2d706a6ac656    16  0f860c010000   jna 0x2d706a6ac768  <+0x128> ;; rspがmemory(rbx)以下ならジャンプ
+0x2d706a6ac65c    1c  83f802         cmpl rax,0x2 ;; おそらく lib.rs:4 if n <= 1 { の部分
+0x2d706a6ac65f    1f  0f8cd1000000   jl 0x2d706a6ac736  <+0xf6> ;; raxが2より小さい場合(n<2)は飛ぶ
+0x2d706a6ac665    25  33d2           xorl rdx,rdx ;; rdx = 0
 0x2d706a6ac667    27  e90f000000     jmp 0x2d706a6ac67b  <+0x3b>
 0x2d706a6ac66c    2c  0f1f4000       nop
-0x2d706a6ac670    30  488bc3         REX.W movq rax,rbx
+0x2d706a6ac670    30  488bc3         REX.W movq rax,rbx ;; e8から飛んでくる
 0x2d706a6ac673    33  488b5dd8       REX.W movq rbx,[rbp-0x28]
 0x2d706a6ac677    37  488b75f0       REX.W movq rsi,[rbp-0x10]
-0x2d706a6ac67b    3b  488945e8       REX.W movq [rbp-0x18],rax
-0x2d706a6ac67f    3f  488955e0       REX.W movq [rbp-0x20],rdx
+0x2d706a6ac67b    3b  488945e8       REX.W movq [rbp-0x18],rax ;; memory(rbp - 24) = rax
+0x2d706a6ac67f    3f  488955e0       REX.W movq [rbp-0x20],rdx ;; memory(rbp - 30) = rdx
 0x2d706a6ac683    43  483b23         REX.W cmpq rsp,[rbx]
-0x2d706a6ac686    46  0f86f6000000   jna 0x2d706a6ac782  <+0x142>
-0x2d706a6ac68c    4c  8d48ff         leal rcx,[rax-0x1]
-0x2d706a6ac68f    4f  49ba0000000001000000 REX.W movq r10,0x100000000
+0x2d706a6ac686    46  0f86f6000000   jna 0x2d706a6ac782  <+0x142> ;; rspがmemory(rbx)以下の場合は飛ぶ
+0x2d706a6ac68c    4c  8d48ff         leal rcx,[rax-0x1] ;; rcx = rax - 1(addressを代入)
+0x2d706a6ac68f    4f  49ba0000000001000000 REX.W movq r10,0x100000000 ;; r10 = 0x100000000
 0x2d706a6ac699    59  4c3bd1         REX.W cmpq r10,rcx
-0x2d706a6ac69c    5c  7720           ja 0x2d706a6ac6be  <+0x7e>
-0x2d706a6ac69e    5e  bf01000000     movl rdi,0x1
-0x2d706a6ac6a3    63  4989e2         REX.W movq r10,rsp
-0x2d706a6ac6a6    66  4883ec08       REX.W subq rsp,0x8
-0x2d706a6ac6aa    6a  4883e4f0       REX.W andq rsp,0xf0
-0x2d706a6ac6ae    6e  4c891424       REX.W movq [rsp],r10
-0x2d706a6ac6b2    72  48b820cc7e0b01000000 REX.W movq rax,0x10b7ecc20    ;; external reference (abort_with_reason)
+0x2d706a6ac69c    5c  7720           ja 0x2d706a6ac6be  <+0x7e> ;; r10 > rcxなら飛ぶ(つまりrcx <= 0x100000000なら飛ぶ)
+0x2d706a6ac69e    5e  bf01000000     movl rdi,0x1 ;; rdi = 0x1
+0x2d706a6ac6a3    63  4989e2         REX.W movq r10,rsp ;; r10 = rsp
+0x2d706a6ac6a6    66  4883ec08       REX.W subq rsp,0x8 ;; rsp = rsp - 8
+0x2d706a6ac6aa    6a  4883e4f0       REX.W andq rsp,0xf0 ;; rsp = rsp & 0xf0(16)
+0x2d706a6ac6ae    6e  4c891424       REX.W movq [rsp],r10 ;; memory(rsp) = r10
+0x2d706a6ac6b2    72  48b820cc7e0b01000000 REX.W movq rax,0x10b7ecc20 ;; rax = 0x10b7ecc20  ;; external reference (abort_with_reason)
 0x2d706a6ac6bc    7c  ffd0           call rax
-0x2d706a6ac6be    7e  488bc1         REX.W movq rax,rcx
+0x2d706a6ac6be    7e  488bc1         REX.W movq rax,rcx ;; 5cから飛ばされてくる
 0x2d706a6ac6c1    81  e83af9ffff     call 0x2d706a6ac000     ;; internal wasm call
-0x2d706a6ac6c6    86  488b55e0       REX.W movq rdx,[rbp-0x20]
-0x2d706a6ac6ca    8a  03d0           addl rdx,rax
-0x2d706a6ac6cc    8c  4c8b15beffffff REX.W movq r10,[rip+0xffffffbe]
+0x2d706a6ac6c6    86  488b55e0       REX.W movq rdx,[rbp-0x20] ;; rdx = memory(rbp - 0x20)
+0x2d706a6ac6ca    8a  03d0           addl rdx,rax ;; rdx = rdx + rax
+0x2d706a6ac6cc    8c  4c8b15beffffff REX.W movq r10,[rip+0xffffffbe] ;; r10 = memory(rip + 0xffffffbe)
 0x2d706a6ac6d3    93  4c3bd2         REX.W cmpq r10,rdx
-0x2d706a6ac6d6    96  771d           ja 0x2d706a6ac6f5  <+0xb5>
-0x2d706a6ac6d8    98  bf01000000     movl rdi,0x1
-0x2d706a6ac6dd    9d  4989e2         REX.W movq r10,rsp
-0x2d706a6ac6e0    a0  4883ec08       REX.W subq rsp,0x8
-0x2d706a6ac6e4    a4  4883e4f0       REX.W andq rsp,0xf0
-0x2d706a6ac6e8    a8  4c891424       REX.W movq [rsp],r10
-0x2d706a6ac6ec    ac  488b05c1ffffff REX.W movq rax,[rip+0xffffffc1]
-0x2d706a6ac6f3    b3  ffd0           call rax
-0x2d706a6ac6f5    b5  488b45e8       REX.W movq rax,[rbp-0x18]
-0x2d706a6ac6f9    b9  8d58fe         leal rbx,[rax-0x2]
-0x2d706a6ac6fc    bc  4c8b158effffff REX.W movq r10,[rip+0xffffff8e]
-0x2d706a6ac703    c3  4c3bd3         REX.W cmpq r10,rbx
-0x2d706a6ac706    c6  771d           ja 0x2d706a6ac725  <+0xe5>
-0x2d706a6ac708    c8  bf01000000     movl rdi,0x1
-0x2d706a6ac70d    cd  4989e2         REX.W movq r10,rsp
-0x2d706a6ac710    d0  4883ec08       REX.W subq rsp,0x8
-0x2d706a6ac714    d4  4883e4f0       REX.W andq rsp,0xf0
-0x2d706a6ac718    d8  4c891424       REX.W movq [rsp],r10
-0x2d706a6ac71c    dc  488b0591ffffff REX.W movq rax,[rip+0xffffff91]
-0x2d706a6ac723    e3  ffd0           call rax
-0x2d706a6ac725    e5  83f803         cmpl rax,0x3
-0x2d706a6ac728    e8  0f8f42ffffff   jg 0x2d706a6ac670  <+0x30>
-0x2d706a6ac72e    ee  488bc3         REX.W movq rax,rbx
-0x2d706a6ac731    f1  e902000000     jmp 0x2d706a6ac738  <+0xf8>
-0x2d706a6ac736    f6  33d2           xorl rdx,rdx
-0x2d706a6ac738    f8  03c2           addl rax,rdx
-0x2d706a6ac73a    fa  4c8b1550ffffff REX.W movq r10,[rip+0xffffff50]
-0x2d706a6ac741   101  4c3bd0         REX.W cmpq r10,rax
-0x2d706a6ac744   104  771d           ja 0x2d706a6ac763  <+0x123>
-0x2d706a6ac746   106  bf01000000     movl rdi,0x1
-0x2d706a6ac74b   10b  4989e2         REX.W movq r10,rsp
-0x2d706a6ac74e   10e  4883ec08       REX.W subq rsp,0x8
-0x2d706a6ac752   112  4883e4f0       REX.W andq rsp,0xf0
-0x2d706a6ac756   116  4c891424       REX.W movq [rsp],r10
-0x2d706a6ac75a   11a  488b0553ffffff REX.W movq rax,[rip+0xffffff53]
-0x2d706a6ac761   121  ffd0           call rax
-0x2d706a6ac763   123  488be5         REX.W movq rsp,rbp
-0x2d706a6ac766   126  5d             pop rbp
-0x2d706a6ac767   127  c3             retl
+0x2d706a6ac6d6    96  771d           ja 0x2d706a6ac6f5  <+0xb5> ;; r10がrdxより大きければ飛ぶ
+0x2d706a6ac6d8    98  bf01000000     movl rdi,0x1 ;; rdi = 0x1
+0x2d706a6ac6dd    9d  4989e2         REX.W movq r10,rsp ;; r10 = rsp
+0x2d706a6ac6e0    a0  4883ec08       REX.W subq rsp,0x8 ;; rsp -= 0x8
+0x2d706a6ac6e4    a4  4883e4f0       REX.W andq rsp,0xf0 ;; rsp += 0xf0
+0x2d706a6ac6e8    a8  4c891424       REX.W movq [rsp],r10 ;; memory(rsp) = r10
+0x2d706a6ac6ec    ac  488b05c1ffffff REX.W movq rax,[rip+0xffffffc1] ;; rax = memory(rip+0xffffffc1)
+0x2d706a6ac6f3    b3  ffd0           call rax ;; raxのアドレスに飛ぶ
+0x2d706a6ac6f5    b5  488b45e8       REX.W movq rax,[rbp-0x18] ;; 96から飛んでくる
+0x2d706a6ac6f9    b9  8d58fe         leal rbx,[rax-0x2] ;; rbx = rax - 0x2(addressを代入)
+0x2d706a6ac6fc    bc  4c8b158effffff REX.W movq r10,[rip+0xffffff8e] ;; r10 = memory(rip + 0xffffff8e)
+0x2d706a6ac703    c3  4c3bd3         REX.W cmpq r10,rbx 
+0x2d706a6ac706    c6  771d           ja 0x2d706a6ac725  <+0xe5> ;; r10がrbxより大きければe5に飛ぶ
+0x2d706a6ac708    c8  bf01000000     movl rdi,0x1 ;; rdi = 1
+0x2d706a6ac70d    cd  4989e2         REX.W movq r10,rsp ;; r10 = rsp
+0x2d706a6ac710    d0  4883ec08       REX.W subq rsp,0x8 ;; rsp -= 8
+0x2d706a6ac714    d4  4883e4f0       REX.W andq rsp,0xf0 ;; rsp = rsp & 0xf0
+0x2d706a6ac718    d8  4c891424       REX.W movq [rsp],r10 ;; memory(rsp) = r10
+0x2d706a6ac71c    dc  488b0591ffffff REX.W movq rax,[rip+0xffffff91] ;; rax = memory(rip+0xffffff91)
+0x2d706a6ac723    e3  ffd0           call rax ;; raxを呼ぶ
+0x2d706a6ac725    e5  83f803         cmpl rax,0x3 ;; c6から飛んでくる
+0x2d706a6ac728    e8  0f8f42ffffff   jg 0x2d706a6ac670  <+0x30> ;; raxが0x3より大きければ飛ぶ ;; ここで前の方に飛ぶ、怪しい!
+0x2d706a6ac72e    ee  488bc3         REX.W movq rax,rbx ;; rax = rbx
+0x2d706a6ac731    f1  e902000000     jmp 0x2d706a6ac738  <+0xf8> ;; f8に飛ぶ
+0x2d706a6ac736    f6  33d2           xorl rdx,rdx ;; if n <= 1 がfalseでここに飛ぶ(1cのところ)
+0x2d706a6ac738    f8  03c2           addl rax,rdx ;; rax += rdx ;; f1から飛んでくる
+0x2d706a6ac73a    fa  4c8b1550ffffff REX.W movq r10,[rip+0xffffff50] ;; r10 = memory(rip+0xffffff50)
+0x2d706a6ac741   101  4c3bd0         REX.W cmpq r10,rax 
+0x2d706a6ac744   104  771d           ja 0x2d706a6ac763  <+0x123> ;; r10がraxより大きければ飛ぶ
+0x2d706a6ac746   106  bf01000000     movl rdi,0x1 ;; rdi = 1
+0x2d706a6ac74b   10b  4989e2         REX.W movq r10,rsp ;; r10 = rsp
+0x2d706a6ac74e   10e  4883ec08       REX.W subq rsp,0x8 ;; rsp -= 8
+0x2d706a6ac752   112  4883e4f0       REX.W andq rsp,0xf0 ;; rsp = rsp & 0xf0
+0x2d706a6ac756   116  4c891424       REX.W movq [rsp],r10 ;; memory(rsp) = r10
+0x2d706a6ac75a   11a  488b0553ffffff REX.W movq rax,[rip+0xffffff53] ;; rax = memory(rip+0xffffff53)
+0x2d706a6ac761   121  ffd0           call rax ;; rax関数を呼ぶ　
+0x2d706a6ac763   123  488be5         REX.W movq rsp,rbp ;; 104から飛んでくる
+0x2d706a6ac766   126  5d             pop rbp 
+0x2d706a6ac767   127  c3             retl ;; return!!
 0x2d706a6ac768   128  488945e8       REX.W movq [rbp-0x18],rax
 0x2d706a6ac76c   12c  e83ffbffff     call 0x2d706a6ac2b0     ;; wasm stub: WasmStackGuard
 0x2d706a6ac771   131  488b45e8       REX.W movq rax,[rbp-0x18]
 0x2d706a6ac775   135  488b75f0       REX.W movq rsi,[rbp-0x10]
 0x2d706a6ac779   139  488b5dd8       REX.W movq rbx,[rbp-0x28]
 0x2d706a6ac77d   13d  e9dafeffff     jmp 0x2d706a6ac65c  <+0x1c>
-0x2d706a6ac782   142  e829fbffff     call 0x2d706a6ac2b0     ;; wasm stub: WasmStackGuard
+0x2d706a6ac782   142  e829fbffff     call 0x2d706a6ac2b0     ;; wasm stub: WasmStackGuard ;;46から飛ばされる
 0x2d706a6ac787   147  488b45e8       REX.W movq rax,[rbp-0x18]
 0x2d706a6ac78b   14b  488b75f0       REX.W movq rsi,[rbp-0x10]
 0x2d706a6ac78f   14f  e9f8feffff     jmp 0x2d706a6ac68c  <+0x4c>
@@ -247,6 +249,8 @@ RelocInfo (size = 10)
 0x2d706a6ac783  wasm stub call
 
 --- End code ---
+
+;; 可能性ある
 --- WebAssembly code ---
 index: 1
 kind: wasm function
